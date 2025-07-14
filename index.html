@@ -37,8 +37,8 @@
     <button onclick="generateRegisterNumbers()">Generate</button>
     <button onclick="downloadCSV()">Download CSV</button>
 
-    <h3>Generated Exam Register Numbers:</h3>
-    <pre id="output"></pre>
+    <h3>Exam Index Numbers (Column Format):</h3>
+    <textarea id="examIndexOutput" rows="10" cols="20" readonly></textarea>
 
     <script>
         const classCodeMap = {
@@ -55,6 +55,7 @@
         };
 
         let generatedData = [];
+        let examIndexList = [];
 
         function generateRegisterNumbers() {
             const selectedClass = document.getElementById('classSelect').value;
@@ -75,7 +76,7 @@
             );
 
             generatedData = [['Student Register Number', 'Exam Register Number']];
-            let outputText = 'Student Register Number\tExam Register Number\n';
+            examIndexList = [];
 
             for (let i = startNum; i <= endNum; i++) {
                 if (excludeSet.has(i)) continue;
@@ -83,14 +84,14 @@
                 const studentRegNum = i.toString();
                 const examRegNum = classCode + i.toString().padStart(2, '0');
                 generatedData.push([studentRegNum, examRegNum]);
-                outputText += `${studentRegNum}\t${examRegNum}\n`;
+                examIndexList.push(examRegNum);
             }
 
-            if (generatedData.length === 1) {
-                outputText += "No register numbers generated (all excluded or invalid range).";
+            if (examIndexList.length === 0) {
+                document.getElementById('examIndexOutput').value = "No exam index numbers generated.";
+            } else {
+                document.getElementById('examIndexOutput').value = examIndexList.join('\n');
             }
-
-            document.getElementById('output').textContent = outputText;
         }
 
         function downloadCSV() {
