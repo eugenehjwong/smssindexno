@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exam Register Number Generator</title>
+</head>
+<body>
+    <h2>Exam Register Number Generator</h2>
+
+    <label for="classSelect">Select Class:</label>
+    <select id="classSelect">
+        <option value="TEMPERANCE">TEMPERANCE</option>
+        <option value="GENTLENESS">GENTLENESS</option>
+        <option value="FAITHFULNESS">FAITHFULNESS</option>
+        <option value="GOODNESS">GOODNESS</option>
+        <option value="KINDNESS">KINDNESS</option>
+        <option value="PATIENCE">PATIENCE</option>
+        <option value="PEACE">PEACE</option>
+        <option value="JOY">JOY</option>
+        <option value="LOVE">LOVE</option>
+        <option value="DEVOTION">DEVOTION</option>
+    </select>
+    <br><br>
+
+    <label for="startNum">Start Register Number:</label>
+    <input type="number" id="startNum" min="1">
+    <br><br>
+
+    <label for="endNum">End Register Number:</label>
+    <input type="number" id="endNum" min="1">
+    <br><br>
+
+    <button onclick="generateRegisterNumbers()">Generate</button>
+    <button onclick="downloadCSV()">Download CSV</button>
+
+    <h3>Generated Exam Register Numbers:</h3>
+    <pre id="output"></pre>
+
+    <script>
+        const classCodeMap = {
+            'TEMPERANCE': 'TP',
+            'GENTLENESS': 'GT',
+            'FAITHFULNESS': 'FN',
+            'GOODNESS': 'GD',
+            'KINDNESS': 'KD',
+            'PATIENCE': 'PT',
+            'PEACE': 'PC',
+            'JOY': 'JY',
+            'LOVE': 'LV',
+            'DEVOTION': 'DV'
+        };
+
+        let generatedData = [];
+
+        function generateRegisterNumbers() {
+            const selectedClass = document.getElementById('classSelect').value;
+            const startNum = parseInt(document.getElementById('startNum').value);
+            const endNum = parseInt(document.getElementById('endNum').value);
+            const classCode = classCodeMap[selectedClass];
+
+            if (isNaN(startNum) || isNaN(endNum) || startNum < 1 || endNum < startNum) {
+                alert("Please enter a valid start and end number.");
+                return;
+            }
+
+            generatedData = [['Student Register Number', 'Exam Register Number']];
+            let outputText = 'Student Register Number\tExam Register Number\n';
+
+            for (let i = startNum; i <= endNum; i++) {
+                const studentRegNum = i.toString();
+                const examRegNum = classCode + i.toString().padStart(2, '0');
+                generatedData.push([studentRegNum, examRegNum]);
+                outputText += `${studentRegNum}\t${examRegNum}\n`;
+            }
+
+            document.getElementById('output').textContent = outputText;
+        }
+
+        function downloadCSV() {
+            if (generatedData.length <= 1) {
+                alert("No data to download. Please generate numbers first.");
+                return;
+            }
+
+            const csvContent = generatedData.map(row => row.join(',')).join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "exam_register_numbers.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
