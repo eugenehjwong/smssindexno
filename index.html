@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Exam Register Number Generator</title>
+    <title>Exam Register Number Generator with Exclusions</title>
 </head>
 <body>
     <h2>Exam Register Number Generator</h2>
@@ -28,6 +28,10 @@
 
     <label for="endNum">End Register Number:</label>
     <input type="number" id="endNum" min="1">
+    <br><br>
+
+    <label for="excludeNums">Exclude Register Numbers (comma-separated):</label>
+    <input type="text" id="excludeNums" placeholder="e.g. 3,7,15">
     <br><br>
 
     <button onclick="generateRegisterNumbers()">Generate</button>
@@ -56,6 +60,7 @@
             const selectedClass = document.getElementById('classSelect').value;
             const startNum = parseInt(document.getElementById('startNum').value);
             const endNum = parseInt(document.getElementById('endNum').value);
+            const excludeInput = document.getElementById('excludeNums').value;
             const classCode = classCodeMap[selectedClass];
 
             if (isNaN(startNum) || isNaN(endNum) || startNum < 1 || endNum < startNum) {
@@ -63,14 +68,26 @@
                 return;
             }
 
+            const excludeSet = new Set(
+                excludeInput.split(',')
+                            .map(num => parseInt(num.trim()))
+                            .filter(num => !isNaN(num))
+            );
+
             generatedData = [['Student Register Number', 'Exam Register Number']];
             let outputText = 'Student Register Number\tExam Register Number\n';
 
             for (let i = startNum; i <= endNum; i++) {
+                if (excludeSet.has(i)) continue;
+
                 const studentRegNum = i.toString();
                 const examRegNum = classCode + i.toString().padStart(2, '0');
                 generatedData.push([studentRegNum, examRegNum]);
                 outputText += `${studentRegNum}\t${examRegNum}\n`;
+            }
+
+            if (generatedData.length === 1) {
+                outputText += "No register numbers generated (all excluded or invalid range).";
             }
 
             document.getElementById('output').textContent = outputText;
